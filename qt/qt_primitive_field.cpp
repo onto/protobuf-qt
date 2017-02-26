@@ -180,7 +180,8 @@ GenerateMergeFromCodedStream(io::Printer* printer) const {
     "$set_hasbit$\n"
     "DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<\n"
     "         $type$, $wire_format_field_type$>(\n"
-    "       input, &$name$_)));\n");
+    "       input, &$name$_)));\n"
+    "emit $name$_changed($name$_);\n");
 }
 
 void PrimitiveFieldGenerator::
