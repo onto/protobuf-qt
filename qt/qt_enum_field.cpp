@@ -82,6 +82,13 @@ GenerateAccessorDeclarations(io::Printer* printer) const {
 }
 
 void EnumFieldGenerator::
+GenerateSignalDeclarations(io::Printer *printer) const
+{
+  printer->Print(variables_,
+    "Q_SIGNAL void $name$_changed($type$ value);\n");
+}
+
+void EnumFieldGenerator::
 GenerateInlineAccessorDefinitions(io::Printer* printer,
                                   bool is_inline) const {
   std::map<string, string> variables(variables_);
@@ -99,13 +106,16 @@ GenerateInlineAccessorDefinitions(io::Printer* printer,
   printer->Print(variables,
     "  $set_hasbit$\n"
     "  $name$_ = value;\n"
+    "  emit $name$_changed(value);\n"
     "  // @@protoc_insertion_point(field_set:$full_name$)\n"
     "}\n");
 }
 
 void EnumFieldGenerator::
 GenerateClearingCode(io::Printer* printer) const {
-  printer->Print(variables_, "$name$_ = $default$;\n");
+  printer->Print(variables_,
+    "$name$_ = $default$;\n"
+    "emit $name$_changed(static_cast< $type$ >($default$));\n");
 }
 
 void EnumFieldGenerator::
@@ -115,7 +125,9 @@ GenerateMergingCode(io::Printer* printer) const {
 
 void EnumFieldGenerator::
 GenerateSwappingCode(io::Printer* printer) const {
-  printer->Print(variables_, "std::swap($name$_, other->$name$_);\n");
+  printer->Print(variables_,
+    "std::swap($name$_, other->$name$_);\n"
+    "emit $name$_changed(static_cast< $type$ >($name$_));\n");
 }
 
 void EnumFieldGenerator::
@@ -230,9 +242,8 @@ GenerateSwappingCode(io::Printer* printer) const {
 
 void EnumOneofFieldGenerator::
 GenerateConstructorCode(io::Printer* printer) const {
-  printer->Print(
-      variables_,
-      "_$classname$_default_instance_.$name$_ = $default$;\n");
+  printer->Print(variables_,
+    "_$classname$_default_instance_.$name$_ = $default$;\n");
 }
 
 // ===================================================================
@@ -265,6 +276,11 @@ GenerateAccessorDeclarations(io::Printer* printer) const {
   printer->Print(variables_,
     "$deprecated_attr$const ::google::protobuf::RepeatedField<int>& $name$() const;\n"
     "$deprecated_attr$::google::protobuf::RepeatedField<int>* mutable_$name$();\n");
+}
+
+void RepeatedEnumFieldGenerator::GenerateSignalDeclarations(io::Printer *printer) const
+{
+
 }
 
 void RepeatedEnumFieldGenerator::
