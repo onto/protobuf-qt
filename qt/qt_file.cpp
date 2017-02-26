@@ -764,7 +764,8 @@ void FileGenerator::GenerateNamespaceOpeners(io::Printer* printer) {
   if (package_parts_.size() > 0) printer->Print("\n");
 
   for (int i = 0; i < package_parts_.size(); i++) {
-    printer->Print("namespace $part$ {\n",
+    printer->Print("namespace $part$ {\n"
+                   "Q_NAMESPACE \n",
                    "part", package_parts_[i]);
   }
 }
@@ -912,6 +913,9 @@ void FileGenerator::GenerateLibraryIncludes(io::Printer* printer) {
     printer->Print(
       "#include <google/protobuf/any.h>\n");
   }
+
+  printer->Print(
+    "#include <QObject>\n");
 }
 
 void FileGenerator::GenerateMetadataPragma(io::Printer* printer,
