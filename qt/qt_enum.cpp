@@ -125,6 +125,10 @@ void EnumGenerator::GenerateDefinition(io::Printer* printer) {
   printer->Outdent();
   printer->Print("\n};\n");
 
+  // Register enum in Qt MOC
+  printer->Print(vars,
+                 "Q_ENUMS($enumbase$);\n");
+
   vars["min_name"] = EnumValueName(min_value);
   vars["max_name"] = EnumValueName(max_value);
 
