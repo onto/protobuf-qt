@@ -143,6 +143,11 @@ GenerateAccessorDeclarations(io::Printer* printer) const {
   }
 }
 
+void MessageFieldGenerator::GenerateSignalDeclarations(io::Printer *printer) const
+{
+
+}
+
 void MessageFieldGenerator::GenerateNonInlineAccessorDefinitions(
     io::Printer* printer) const {
   if (SupportsArenas(descriptor_)) {
@@ -946,6 +951,11 @@ GenerateAccessorDeclarations(io::Printer* printer) const {
       "$deprecated_attr$const ::google::protobuf::RepeatedPtrField< $type$ >&\n"
       "    $name$() const;\n");
   }
+}
+
+void RepeatedMessageFieldGenerator::GenerateSignalDeclarations(io::Printer *printer) const
+{
+
 }
 
 void RepeatedMessageFieldGenerator::

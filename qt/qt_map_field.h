@@ -49,6 +49,7 @@ class MapFieldGenerator : public FieldGenerator {
   // implements FieldGenerator ---------------------------------------
   void GeneratePrivateMembers(io::Printer* printer) const;
   void GenerateAccessorDeclarations(io::Printer* printer) const;
+  void GenerateSignalDeclarations(io::Printer* printer) const;
   void GenerateInlineAccessorDefinitions(io::Printer* printer,
                                          bool is_inline) const;
   void GenerateClearingCode(io::Printer* printer) const;

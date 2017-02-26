@@ -174,6 +174,11 @@ GenerateAccessorDeclarations(io::Printer* printer) const {
   }
 }
 
+void StringFieldGenerator::GenerateSignalDeclarations(io::Printer *printer) const
+{
+
+}
+
 void StringFieldGenerator::
 GenerateInlineAccessorDefinitions(io::Printer* printer,
                                   bool is_inline) const {
@@ -851,6 +856,11 @@ GenerateAccessorDeclarations(io::Printer* printer) const {
     printer->Print(" public:\n");
     printer->Indent();
   }
+}
+
+void RepeatedStringFieldGenerator::GenerateSignalDeclarations(io::Printer *printer) const
+{
+
 }
 
 void RepeatedStringFieldGenerator::
