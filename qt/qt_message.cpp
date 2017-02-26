@@ -697,6 +697,8 @@ GenerateFieldAccessorDeclarations(io::Printer* printer) {
 
     // Generate type-specific accessor declarations.
     field_generators_.get(field).GenerateAccessorDeclarations(printer);
+    // Generate type-specific signal declarations.
+    field_generators_.get(field).GenerateSignalDeclarations(printer);
 
     printer->Print("\n");
   }
@@ -716,6 +718,11 @@ GenerateFieldAccessorDeclarations(io::Printer* printer) {
         UnderscoresToCamelCase(descriptor_->oneof_decl(i)->name(), true),
         "oneof_name", descriptor_->oneof_decl(i)->name());
   }
+}
+
+void MessageGenerator::GenerateFieldSignalDeclarations(io::Printer *printer)
+{
+
 }
 
 void MessageGenerator::
@@ -1028,9 +1035,10 @@ GenerateClassDefinition(io::Printer* printer) {
     vars["superclass"] = SuperClassName(descriptor_, options_);
   }
   printer->Print(vars,
-    "class $dllexport$$classname$ : public $superclass$ "
+    "class $dllexport$$classname$ : public QObject, public $superclass$"
     "/* @@protoc_insertion_point(class_definition:$full_name$) */ "
     "{\n");
+  printer->Print("  Q_OBJECT\n");
   printer->Annotate("classname", descriptor_);
   if (use_dependent_base_) {
     printer->Print(vars, "  friend class $superclass$;\n");
@@ -1095,10 +1103,11 @@ GenerateClassDefinition(io::Printer* printer) {
   // Generate enum values for every field in oneofs. One list is generated for
   // each oneof with an additional *_NOT_SET value.
   for (int i = 0; i < descriptor_->oneof_decl_count(); i++) {
+    std::string enum_name = UnderscoresToCamelCase(descriptor_->oneof_decl(i)->name(), true);
     printer->Print(
         "enum $camel_oneof_name$Case {\n",
         "camel_oneof_name",
-        UnderscoresToCamelCase(descriptor_->oneof_decl(i)->name(), true));
+        enum_name);
     printer->Indent();
     for (int j = 0; j < descriptor_->oneof_decl(i)->field_count(); j++) {
       printer->Print(
@@ -1116,7 +1125,10 @@ GenerateClassDefinition(io::Printer* printer) {
     printer->Outdent();
     printer->Print(
         "};\n"
-        "\n");
+        "Q_ENUM($camel_oneof_name$Case);"
+        "\n",
+        "camel_oneof_name",
+        enum_name);
   }
 
   // TODO(gerbens) make this private, while still granting other protos access.
@@ -1295,6 +1307,8 @@ GenerateClassDefinition(io::Printer* printer) {
 
   // Generate accessor methods for all fields.
   GenerateFieldAccessorDeclarations(printer);
+
+  GenerateFieldSignalDeclarations(printer);
 
   // Declare extension identifiers.
   for (int i = 0; i < descriptor_->extension_count(); i++) {
@@ -2099,7 +2113,7 @@ GenerateStructors(io::Printer* printer) {
 
   printer->Print(
       "$classname$::$classname$()\n"
-      "  : $superclass$()$initializer$ {\n"
+      "  : QObject(),$superclass$()$initializer$ {\n"
       "  if (GOOGLE_PREDICT_TRUE(this != internal_default_instance())) {\n"
       "    $file_namespace$::InitDefaults();\n"
       "  }\n"
@@ -2131,7 +2145,7 @@ GenerateStructors(io::Printer* printer) {
   // Generate the copy constructor.
   printer->Print(
     "$classname$::$classname$(const $classname$& from)\n"
-    "  : $superclass$()",
+    "  : QObject(),$superclass$()",
     "classname", classname_,
     "superclass", superclass,
     "full_name", descriptor_->full_name());

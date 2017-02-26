@@ -119,6 +119,7 @@ class MessageGenerator {
   void GenerateDependentBaseClassDefinition(io::Printer* printer);
   void GenerateDependentFieldAccessorDeclarations(io::Printer* printer);
   void GenerateFieldAccessorDeclarations(io::Printer* printer);
+  void GenerateFieldSignalDeclarations(io::Printer* printer);
   void GenerateDependentFieldAccessorDefinitions(io::Printer* printer);
   void GenerateFieldAccessorDefinitions(io::Printer* printer, bool is_inline);
 
