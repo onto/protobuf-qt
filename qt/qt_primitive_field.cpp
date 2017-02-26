@@ -134,13 +134,22 @@ GenerateInlineAccessorDefinitions(io::Printer* printer, bool is_inline) const {
     "$inline$void $classname$::set_$name$($type$ value) {\n"
     "  $set_hasbit$\n"
     "  $name$_ = value;\n"
+    "  emit $name$_changed(value);\n"
     "  // @@protoc_insertion_point(field_set:$full_name$)\n"
     "}\n");
 }
 
 void PrimitiveFieldGenerator::
+GenerateSignalDeclarations(io::Printer *printer) const {
+  printer->Print(variables_,
+    "Q_SIGNAL void $name$_changed($type$ value);\n");
+}
+
+void PrimitiveFieldGenerator::
 GenerateClearingCode(io::Printer* printer) const {
-  printer->Print(variables_, "$name$_ = $default$;\n");
+  printer->Print(variables_,
+                 "$name$_ = $default$;\n"
+                 "emit $name$_changed($default$);\n");
 }
 
 void PrimitiveFieldGenerator::
@@ -150,7 +159,9 @@ GenerateMergingCode(io::Printer* printer) const {
 
 void PrimitiveFieldGenerator::
 GenerateSwappingCode(io::Printer* printer) const {
-  printer->Print(variables_, "std::swap($name$_, other->$name$_);\n");
+  printer->Print(variables_,
+                 "std::swap($name$_, other->$name$_);\n"
+                 "emit $name$_changed($name$_);\n");
 }
 
 void PrimitiveFieldGenerator::
@@ -229,13 +240,16 @@ GenerateInlineAccessorDefinitions(io::Printer* printer, bool is_inline) const {
     "    set_has_$name$();\n"
     "  }\n"
     "  $oneof_prefix$$name$_ = value;\n"
+    "  emit $name$_changed(value);\n"
     "  // @@protoc_insertion_point(field_set:$full_name$)\n"
     "}\n");
 }
 
 void PrimitiveOneofFieldGenerator::
 GenerateClearingCode(io::Printer* printer) const {
-  printer->Print(variables_, "$oneof_prefix$$name$_ = $default$;\n");
+  printer->Print(variables_,
+                 "$oneof_prefix$$name$_ = $default$;\n"
+                 "emit $name$_changed($default$);\n");
 }
 
 void PrimitiveOneofFieldGenerator::
@@ -300,6 +314,11 @@ GenerateAccessorDeclarations(io::Printer* printer) const {
     "    $name$() const;\n"
     "$deprecated_attr$::google::protobuf::RepeatedField< $type$ >*\n"
     "    mutable_$name$();\n");
+}
+
+void RepeatedPrimitiveFieldGenerator::GenerateSignalDeclarations(io::Printer *printer) const
+{
+
 }
 
 void RepeatedPrimitiveFieldGenerator::

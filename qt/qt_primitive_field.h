@@ -56,6 +56,7 @@ class PrimitiveFieldGenerator : public FieldGenerator {
   void GenerateAccessorDeclarations(io::Printer* printer) const;
   void GenerateInlineAccessorDefinitions(io::Printer* printer,
                                          bool is_inline) const;
+  void GenerateSignalDeclarations(io::Printer* printer) const;
   void GenerateClearingCode(io::Printer* printer) const;
   void GenerateMergingCode(io::Printer* printer) const;
   void GenerateSwappingCode(io::Printer* printer) const;
@@ -101,6 +102,7 @@ class RepeatedPrimitiveFieldGenerator : public FieldGenerator {
   // implements FieldGenerator ---------------------------------------
   void GeneratePrivateMembers(io::Printer* printer) const;
   void GenerateAccessorDeclarations(io::Printer* printer) const;
+  void GenerateSignalDeclarations(io::Printer* printer) const;
   void GenerateInlineAccessorDefinitions(io::Printer* printer,
                                          bool is_inline) const;
   void GenerateClearingCode(io::Printer* printer) const;
