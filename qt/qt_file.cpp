@@ -858,8 +858,9 @@ void FileGenerator::GenerateLibraryIncludes(io::Printer* printer) {
   printer->Print(
       "#include <google/protobuf/io/coded_stream.h>\n"
       "#include <google/protobuf/arena.h>\n"
-      "#include <google/protobuf/arenastring.h>\n"
+      "#include <google/protobuf/qt/arenaqstring.h>\n"
       "#include <google/protobuf/generated_message_util.h>\n"
+      "#include <google/protobuf/qt/generated_message_util.h>\n"
       "#include <google/protobuf/metadata.h>\n");
 
   if (!message_generators_.empty()) {
@@ -872,6 +873,7 @@ void FileGenerator::GenerateLibraryIncludes(io::Printer* printer) {
     }
   }
   printer->Print(
+    "#include <google/protobuf/qt/repeated_field.h>\n"
     "#include <google/protobuf/repeated_field.h>"
     "  // IWYU pragma: export\n"
     "#include <google/protobuf/extension_set.h>"
