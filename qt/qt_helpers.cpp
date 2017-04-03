@@ -297,7 +297,7 @@ const char* PrimitiveTypeName(FieldDescriptor::CppType type) {
     case FieldDescriptor::CPPTYPE_FLOAT  : return "float";
     case FieldDescriptor::CPPTYPE_BOOL   : return "bool";
     case FieldDescriptor::CPPTYPE_ENUM   : return "int";
-    case FieldDescriptor::CPPTYPE_STRING : return "::std::string";
+    case FieldDescriptor::CPPTYPE_STRING : return "QString";
     case FieldDescriptor::CPPTYPE_MESSAGE: return NULL;
 
     // No default because we want the compiler to complain if any new
