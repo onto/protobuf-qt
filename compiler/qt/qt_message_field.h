@@ -55,6 +55,7 @@ class MessageFieldGenerator : public FieldGenerator {
   void GeneratePrivateMembers(io::Printer* printer) const;
   void GenerateDependentAccessorDeclarations(io::Printer* printer) const;
   void GenerateAccessorDeclarations(io::Printer* printer) const;
+  void GeneratePropertyDeclarations(io::Printer* printer) const;
   void GenerateSignalDeclarations(io::Printer* printer) const;
   void GenerateDependentInlineAccessorDefinitions(io::Printer* printer) const;
   void GenerateInlineAccessorDefinitions(io::Printer* printer,
@@ -128,6 +129,7 @@ class RepeatedMessageFieldGenerator : public FieldGenerator {
   void GeneratePrivateMembers(io::Printer* printer) const;
   void GenerateDependentAccessorDeclarations(io::Printer* printer) const;
   void GenerateAccessorDeclarations(io::Printer* printer) const;
+  void GeneratePropertyDeclarations(io::Printer* printer) const;
   void GenerateSignalDeclarations(io::Printer* printer) const;
   void GenerateDependentInlineAccessorDefinitions(io::Printer* printer) const;
   void GenerateInlineAccessorDefinitions(io::Printer* printer,

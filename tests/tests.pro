@@ -1,8 +1,9 @@
 TEMPLATE = app
 CONFIG += console c++11
 CONFIG -= app_bundle
+QT += qml
 
-TARGET=protobuf_qt_test
+TARGET = protobuf_qt_test
 
 INCLUDEPATH += $${PROTOBUF_SRC}
 INCLUDEPATH += ../include

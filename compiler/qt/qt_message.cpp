@@ -697,8 +697,6 @@ GenerateFieldAccessorDeclarations(io::Printer* printer) {
 
     // Generate type-specific accessor declarations.
     field_generators_.get(field).GenerateAccessorDeclarations(printer);
-    // Generate type-specific signal declarations.
-    field_generators_.get(field).GenerateSignalDeclarations(printer);
 
     printer->Print("\n");
   }
@@ -720,9 +718,28 @@ GenerateFieldAccessorDeclarations(io::Printer* printer) {
   }
 }
 
+void MessageGenerator::GenerateFieldPropertyDeclarations(io::Printer *printer)
+{
+  for (int i = 0; i < descriptor_->field_count(); i++) {
+    const FieldDescriptor* field = descriptor_->field(i);
+
+    // Generate property declarations.
+    field_generators_.get(field).GeneratePropertyDeclarations(printer);
+  }
+
+  printer->Print("\n");
+}
+
 void MessageGenerator::GenerateFieldSignalDeclarations(io::Printer *printer)
 {
+  for (int i = 0; i < descriptor_->field_count(); i++) {
+    const FieldDescriptor* field = descriptor_->field(i);
 
+    // Generate signal declarations.
+    field_generators_.get(field).GenerateSignalDeclarations(printer);
+  }
+
+  printer->Print("\n");
 }
 
 void MessageGenerator::
@@ -1307,6 +1324,16 @@ GenerateClassDefinition(io::Printer* printer) {
 
   // Generate accessor methods for all fields.
   GenerateFieldAccessorDeclarations(printer);
+
+  printer->Print(
+    "// properties ------------------------------------------------------\n"
+    "\n");
+
+  GenerateFieldPropertyDeclarations(printer);
+
+  printer->Print(
+    "// signals ---------------------------------------------------------\n"
+    "\n");
 
   GenerateFieldSignalDeclarations(printer);
 

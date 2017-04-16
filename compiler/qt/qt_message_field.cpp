@@ -143,6 +143,11 @@ GenerateAccessorDeclarations(io::Printer* printer) const {
   }
 }
 
+void MessageFieldGenerator::GeneratePropertyDeclarations(io::Printer *printer) const
+{
+
+}
+
 void MessageFieldGenerator::GenerateSignalDeclarations(io::Printer *printer) const
 {
 
@@ -951,6 +956,11 @@ GenerateAccessorDeclarations(io::Printer* printer) const {
       "$deprecated_attr$const ::google::protobuf::RepeatedPtrField< $type$ >&\n"
       "    $name$() const;\n");
   }
+}
+
+void RepeatedMessageFieldGenerator::GeneratePropertyDeclarations(io::Printer *printer) const
+{
+
 }
 
 void RepeatedMessageFieldGenerator::GenerateSignalDeclarations(io::Printer *printer) const

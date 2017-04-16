@@ -918,6 +918,9 @@ void FileGenerator::GenerateLibraryIncludes(io::Printer* printer) {
 
   printer->Print(
     "#include <QObject>\n");
+
+  printer->Print(
+    "#include <google/protobuf/qt/qmllist.h>\n");
 }
 
 void FileGenerator::GenerateMetadataPragma(io::Printer* printer,

@@ -138,6 +138,11 @@ GenerateAccessorDeclarations(io::Printer* printer) const {
       "    mutable_$name$();\n");
 }
 
+void MapFieldGenerator::GeneratePropertyDeclarations(io::Printer *printer) const
+{
+
+}
+
 void MapFieldGenerator::GenerateSignalDeclarations(io::Printer *printer) const
 {
 

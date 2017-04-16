@@ -139,6 +139,12 @@ GenerateInlineAccessorDefinitions(io::Printer* printer, bool is_inline) const {
     "}\n");
 }
 
+void PrimitiveFieldGenerator::GeneratePropertyDeclarations(io::Printer *printer) const
+{
+  printer->Print(variables_,
+    "Q_PROPERTY($type$ $name$ READ $name$ WRITE set_$name$ NOTIFY $name$_changed)\n");
+}
+
 void PrimitiveFieldGenerator::
 GenerateSignalDeclarations(io::Printer *printer) const {
   printer->Print(variables_,
@@ -307,6 +313,7 @@ GeneratePrivateMembers(io::Printer* printer) const {
 void RepeatedPrimitiveFieldGenerator::
 GenerateAccessorDeclarations(io::Printer* printer) const {
   printer->Print(variables_,
+    "QQmlListProperty<$type$> $name$_qml_list();\n"
     "$deprecated_attr$$type$ $name$(int index) const;\n"
     "$deprecated_attr$void set_$name$(int index, $type$ value);\n"
     "$deprecated_attr$void add_$name$($type$ value);\n");
@@ -315,6 +322,12 @@ GenerateAccessorDeclarations(io::Printer* printer) const {
     "    $name$() const;\n"
     "$deprecated_attr$::google::protobuf::RepeatedField< $type$ >*\n"
     "    mutable_$name$();\n");
+}
+
+void RepeatedPrimitiveFieldGenerator::GeneratePropertyDeclarations(io::Printer *printer) const
+{
+  printer->Print(variables_,
+    "Q_PROPERTY(QQmlListProperty<$type$> $name$ READ $name$_qml_list)\n");
 }
 
 void RepeatedPrimitiveFieldGenerator::GenerateSignalDeclarations(io::Printer *printer) const
@@ -327,6 +340,14 @@ GenerateInlineAccessorDefinitions(io::Printer* printer, bool is_inline) const {
   std::map<string, string> variables(variables_);
   variables["inline"] = is_inline ? "inline " : "";
   printer->Print(variables,
+    "$inline$QQmlListProperty<$type$> $classname$::$name$_qml_list() {\n"
+    "  // @@protoc_insertion_point(field_get:$full_name$)\n"
+    "  return QQmlListProperty<$type$>(this, &$name$_,\n"
+    "           ::google::protobuf::qt::qml::append_function_primitive<$type$>,\n"
+    "           ::google::protobuf::qt::qml::count_function_primitive<$type$>,\n"
+    "           ::google::protobuf::qt::qml::at_function_primitive<$type$>,\n"
+    "           ::google::protobuf::qt::qml::clear_function_primitive<$type$>);\n"
+    "}\n"
     "$inline$$type$ $classname$::$name$(int index) const {\n"
     "  // @@protoc_insertion_point(field_get:$full_name$)\n"
     "  return $name$_.Get(index);\n"

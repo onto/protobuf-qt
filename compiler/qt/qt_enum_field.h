@@ -53,6 +53,7 @@ class EnumFieldGenerator : public FieldGenerator {
   // implements FieldGenerator ---------------------------------------
   void GeneratePrivateMembers(io::Printer* printer) const;
   void GenerateAccessorDeclarations(io::Printer* printer) const;
+  void GeneratePropertyDeclarations(io::Printer* printer) const;
   void GenerateSignalDeclarations(io::Printer* printer) const;
   void GenerateInlineAccessorDefinitions(io::Printer* printer,
                                          bool is_inline) const;
@@ -100,6 +101,7 @@ class RepeatedEnumFieldGenerator : public FieldGenerator {
   // implements FieldGenerator ---------------------------------------
   void GeneratePrivateMembers(io::Printer* printer) const;
   void GenerateAccessorDeclarations(io::Printer* printer) const;
+  void GeneratePropertyDeclarations(io::Printer* printer) const;
   void GenerateSignalDeclarations(io::Printer* printer) const;
   void GenerateInlineAccessorDefinitions(io::Printer* printer,
                                          bool is_inline) const;

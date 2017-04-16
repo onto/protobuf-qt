@@ -106,6 +106,8 @@ class FieldGenerator {
   // field.  These are placed inside the class definition.
   virtual void GenerateAccessorDeclarations(io::Printer* printer) const = 0;
 
+  // Q_PROPERTY from QObject
+  virtual void GeneratePropertyDeclarations(io::Printer* printer) const = 0;
   // Signals from QObject
   virtual void GenerateSignalDeclarations(io::Printer* printer) const = 0;
 

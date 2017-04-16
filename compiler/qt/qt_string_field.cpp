@@ -164,6 +164,12 @@ GenerateAccessorDeclarations(io::Printer* printer) const {
   }
 }
 
+void StringFieldGenerator::GeneratePropertyDeclarations(io::Printer *printer) const
+{
+  printer->Print(variables_,
+    "Q_PROPERTY(QString $name$ READ $name$ WRITE set_$name$ NOTIFY $name$_changed)\n");
+}
+
 void StringFieldGenerator::GenerateSignalDeclarations(io::Printer *printer) const
 {
   printer->Print(variables_,
@@ -708,6 +714,7 @@ GenerateAccessorDeclarations(io::Printer* printer) const {
   }
 
   printer->Print(variables_,
+    "QQmlListProperty<QString> $name$_qml_list();\n"
     "$deprecated_attr$const QString& $name$(int index) const;\n"
     "$deprecated_attr$QString* mutable_$name$(int index);\n"
     "$deprecated_attr$void set_$name$(int index, const QString& value);\n"
@@ -732,6 +739,12 @@ GenerateAccessorDeclarations(io::Printer* printer) const {
   }
 }
 
+void RepeatedStringFieldGenerator::GeneratePropertyDeclarations(io::Printer *printer) const
+{
+  printer->Print(variables_,
+    "Q_PROPERTY(QQmlListProperty<QString> $name$ READ $name$_qml_list)\n");
+}
+
 void RepeatedStringFieldGenerator::GenerateSignalDeclarations(io::Printer *printer) const
 {
 
@@ -743,6 +756,14 @@ GenerateInlineAccessorDefinitions(io::Printer* printer,
   std::map<string, string> variables(variables_);
   variables["inline"] = is_inline ? "inline " : "";
   printer->Print(variables,
+    "$inline$QQmlListProperty<QString> $classname$::$name$_qml_list() {\n"
+    "  // @@protoc_insertion_point(field_get:$full_name$)\n"
+    "  return QQmlListProperty<QString>(this, &$name$_,\n"
+    "           ::google::protobuf::qt::qml::append_function_object<QString>,\n"
+    "           ::google::protobuf::qt::qml::count_function_object<QString>,\n"
+    "           ::google::protobuf::qt::qml::at_function_object<QString>,\n"
+    "           ::google::protobuf::qt::qml::clear_function_object<QString>);\n"
+    "}\n"
     "$inline$const QString& $classname$::$name$(int index) const {\n"
     "  // @@protoc_insertion_point(field_get:$full_name$)\n"
     "  return $name$_.$cppget$(index);\n"
