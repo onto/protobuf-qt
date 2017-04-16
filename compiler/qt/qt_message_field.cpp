@@ -145,12 +145,14 @@ GenerateAccessorDeclarations(io::Printer* printer) const {
 
 void MessageFieldGenerator::GeneratePropertyDeclarations(io::Printer *printer) const
 {
-
+  printer->Print(variables_,
+    "Q_PROPERTY($type$ $name$ READ $name$ WRITE set_allocated_$name$ NOTIFY $name$_changed)\n");
 }
 
 void MessageFieldGenerator::GenerateSignalDeclarations(io::Printer *printer) const
 {
-
+  printer->Print(variables_,
+    "Q_SIGNAL void $name$_changed($type$ value);\n");
 }
 
 void MessageFieldGenerator::GenerateNonInlineAccessorDefinitions(
@@ -946,6 +948,7 @@ void RepeatedMessageFieldGenerator::
 GenerateAccessorDeclarations(io::Printer* printer) const {
   if (!dependent_getter_) {
     printer->Print(variables_,
+      "QQmlListProperty<$type$> $name$_qml_list();\n"
       "$deprecated_attr$const $type$& $name$(int index) const;\n");
   }
   if (!dependent_field_) {
@@ -960,7 +963,8 @@ GenerateAccessorDeclarations(io::Printer* printer) const {
 
 void RepeatedMessageFieldGenerator::GeneratePropertyDeclarations(io::Printer *printer) const
 {
-
+  printer->Print(variables_,
+    "Q_PROPERTY(QQmlListProperty<$type$> $name$ READ $name$_qml_list)\n");
 }
 
 void RepeatedMessageFieldGenerator::GenerateSignalDeclarations(io::Printer *printer) const
@@ -1032,6 +1036,14 @@ GenerateInlineAccessorDefinitions(io::Printer* printer,
 
   if (!dependent_getter_) {
     printer->Print(variables,
+      "$inline$QQmlListProperty<$type$> $classname$::$name$_qml_list() {\n"
+      "  // @@protoc_insertion_point(field_get:$full_name$)\n"
+      "  return QQmlListProperty<$type$>(this, &$name$_,\n"
+      "           ::google::protobuf::qt::qml::append_function_object<$type$>,\n"
+      "           ::google::protobuf::qt::qml::count_function_object<$type$>,\n"
+      "           ::google::protobuf::qt::qml::at_function_object<$type$>,\n"
+      "           ::google::protobuf::qt::qml::clear_function_object<$type$>);\n"
+      "}\n"
       "$inline$"
       "const $type$& $classname$::$name$(int index) const {\n"
       "  // @@protoc_insertion_point(field_get:$full_name$)\n"
