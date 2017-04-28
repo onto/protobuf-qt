@@ -7,7 +7,14 @@ TARGET = protoc-gen-qt
 
 INCLUDEPATH += $${PROTOBUF_SRC}
 LIBS += -L$${PROTOBUF_LIBS}
-LIBS += -lprotobuf -lprotoc
+
+CONFIG(debug, debug|release) {
+    unix:LIBS += -lprotobufd -lprotocd
+    win32:LIBS += -llibprotobufd -llibprotocd
+} else {
+    unix:LIBS += -lprotobuf -lprotoc
+    win32:LIBS += -llibprotobuf -llibprotoc
+}
 
 SOURCES += main.cpp \
     qt/qt_generator.cpp \
