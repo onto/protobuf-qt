@@ -1,8 +1,8 @@
-#Protobuf-Qt
+# Protobuf-Qt
 
 This lib should help with usage of generated sources from Google Protobuf files with Qt and QML.
 
-###Idea
+### Idea
 
 + Replace std::string by QString
 + Mark all messages classes as QObject
@@ -10,7 +10,7 @@ This lib should help with usage of generated sources from Google Protobuf files 
     - Wrap repeated fields by QQmlListProperty
     - Add signals for fields changes
 
-###Usage
+### Usage
 
 + Build compiler
 + Generate sources; example command:
