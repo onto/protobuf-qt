@@ -155,15 +155,15 @@ void EnumGenerator::GenerateDefinition(io::Printer* printer) {
     // The _Name and _Parse methods
     printer->Print(
         vars,
-        "inline const ::std::string& $classname$_Name($classname$ value) {\n"
-        "  return ::google::protobuf::internal::NameOfEnum(\n"
-        "    $classname$_descriptor(), value);\n"
+        "inline QString $classname$_Name($classname$ value) {\n"
+        "  return QString::fromStdString(::google::protobuf::internal::NameOfEnum(\n"
+        "    $classname$_descriptor(), value));\n"
         "}\n");
     printer->Print(vars,
       "inline bool $classname$_Parse(\n"
-      "    const ::std::string& name, $classname$* value) {\n"
+      "    const QString& name, $classname$* value) {\n"
       "  return ::google::protobuf::internal::ParseNamedEnum<$classname$>(\n"
-      "    $classname$_descriptor(), name, value);\n"
+      "    $classname$_descriptor(), name.toStdString(), value);\n"
       "}\n");
   }
 }
@@ -221,13 +221,13 @@ void EnumGenerator::GenerateSymbolImports(io::Printer* printer) {
       "  return $classname$_descriptor();\n"
       "}\n");
     printer->Print(vars,
-                   "static inline const ::std::string& "
+                   "static inline QString "
                    "$nested_name$_Name($nested_name$ value) {"
                    "\n"
                    "  return $classname$_Name(value);\n"
                    "}\n");
     printer->Print(vars,
-      "static inline bool $nested_name$_Parse(const ::std::string& name,\n"
+      "static inline bool $nested_name$_Parse(const QString& name,\n"
       "    $nested_name$* value) {\n"
       "  return $classname$_Parse(name, value);\n"
       "}\n");
