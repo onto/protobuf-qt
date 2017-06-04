@@ -327,12 +327,13 @@ GenerateAccessorDeclarations(io::Printer* printer) const {
 void RepeatedPrimitiveFieldGenerator::GeneratePropertyDeclarations(io::Printer *printer) const
 {
   printer->Print(variables_,
-    "Q_PROPERTY(QQmlListProperty<$type$> $name$ READ $name$_qml_list)\n");
+    "Q_PROPERTY(QQmlListProperty<$type$> $name$ READ $name$_qml_list NOTIFY $name$_changed)\n");
 }
 
 void RepeatedPrimitiveFieldGenerator::GenerateSignalDeclarations(io::Printer *printer) const
 {
-
+  printer->Print(variables_,
+    "Q_SIGNAL void $name$_changed(QQmlListProperty<$type$> value);\n");
 }
 
 void RepeatedPrimitiveFieldGenerator::

@@ -133,7 +133,8 @@ GenerateAccessorDeclarations(io::Printer* printer) const {
     printer->Print(variables_,
       "$deprecated_attr$$type$* mutable_$name$();\n"
       "$deprecated_attr$$type$* $release_name$();\n"
-      "$deprecated_attr$void set_allocated_$name$($type$* $name$);\n");
+      "$deprecated_attr$void set_allocated_$name$($type$* $name$);\n"
+      "$deprecated_attr$void set_$name$(const $type$* $name$);\n");
   }
   if (SupportsArenas(descriptor_)) {
     printer->Print(variables_,
@@ -146,13 +147,13 @@ GenerateAccessorDeclarations(io::Printer* printer) const {
 void MessageFieldGenerator::GeneratePropertyDeclarations(io::Printer *printer) const
 {
   printer->Print(variables_,
-    "Q_PROPERTY($type$ $name$ READ $name$ WRITE set_allocated_$name$ NOTIFY $name$_changed)\n");
+    "Q_PROPERTY($type$ *$name$ READ mutable_$name$ WRITE set_$name$ NOTIFY $name$_changed)\n");
 }
 
 void MessageFieldGenerator::GenerateSignalDeclarations(io::Printer *printer) const
 {
   printer->Print(variables_,
-    "Q_SIGNAL void $name$_changed($type$ value);\n");
+    "Q_SIGNAL void $name$_changed($type$ *value);\n");
 }
 
 void MessageFieldGenerator::GenerateNonInlineAccessorDefinitions(
@@ -964,12 +965,13 @@ GenerateAccessorDeclarations(io::Printer* printer) const {
 void RepeatedMessageFieldGenerator::GeneratePropertyDeclarations(io::Printer *printer) const
 {
   printer->Print(variables_,
-    "Q_PROPERTY(QQmlListProperty<$type$> $name$ READ $name$_qml_list)\n");
+    "Q_PROPERTY(QQmlListProperty<$type$> $name$ READ $name$_qml_list NOTIFY $name$_changed)\n");
 }
 
 void RepeatedMessageFieldGenerator::GenerateSignalDeclarations(io::Printer *printer) const
 {
-
+  printer->Print(variables_,
+    "Q_SIGNAL void $name$_changed(QQmlListProperty<$type$> value);\n");
 }
 
 void RepeatedMessageFieldGenerator::
