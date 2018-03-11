@@ -6,7 +6,8 @@ QT += qml
 TARGET = protobuf_qt_test
 
 INCLUDEPATH += $${PROTOBUF_SRC}
-INCLUDEPATH += ../include
+
+include(../include/include.pri)
 
 LIBS += -L$${PROTOBUF_LIBS}
 LIBS += -lprotobuf

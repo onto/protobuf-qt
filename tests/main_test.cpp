@@ -1,7 +1,7 @@
 
 #include "Test.pb.h"
 
-int main(int argc, char *argv[])
+int main(int /*argc*/, char */*argv*/[])
 {
    TestDefault message1;
 

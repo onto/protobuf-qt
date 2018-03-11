@@ -7,13 +7,13 @@ namespace google {
 namespace protobuf {
 namespace internal {
 
-inline const QString& GetEmptyQStringAlreadyInited();
+const QString& GetEmptyQStringAlreadyInited();
 
 inline const QString& GetEmptyQString() {
   return GetEmptyQStringAlreadyInited();
 }
 
-inline int QStringSpaceUsedExcludingSelf(const QString& str);
+int QStringSpaceUsedExcludingSelf(const QString& str);
 
 } // namespace google
 } // namespace protobuf
