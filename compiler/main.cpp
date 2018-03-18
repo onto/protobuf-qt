@@ -1,10 +1,12 @@
-#include "qt_generator.h"
+#include "protobuf_qt_generator.h"
+
+#include <google/protobuf/compiler/plugin.h>
 
 #include <iostream>
 
-int main(int /*argc*/, char */*argv*/[])
+int main(int argc, char **argv)
 {
-    google::protobuf::compiler::CodeGeneratorRequest request;
-    return (request.ParseFromIstream(&std::cin)
-            && google::protobuf::compiler::qt::generate(request).SerializeToOstream(&std::cout)) ? 0 : -1;
+    ProtobufQtGenerator generator;
+    return google::protobuf::compiler::PluginMain(argc, argv, &generator);
 }
+

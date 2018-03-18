@@ -1,5 +1,5 @@
 TEMPLATE = app
-CONFIG += console c++11
+CONFIG += console c++11 c++14 c++17 c++1z
 CONFIG -= app_bundle
 CONFIG -= qt
 
@@ -17,11 +17,9 @@ CONFIG(debug, debug|release) {
 }
 
 SOURCES += main.cpp \
-    qt_generator.cpp \
-    qt_file.cpp \
-    qt_message.cpp
+    protobuf_qt_generator.cpp \
+    insertion_point_writer.cpp
 
 HEADERS += \
-    qt_generator.h \
-    qt_file.h \
-    qt_message.h
+    protobuf_qt_generator.h \
+    insertion_point_writer.h
