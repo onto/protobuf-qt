@@ -22,4 +22,6 @@ SOURCES += main.cpp \
 
 HEADERS += \
     protobuf_qt_generator.h \
-    insertion_point_writer.h
+    insertion_point_writer.h \
+    repeated_field_adaptor.h \
+    repeated_fields.h
