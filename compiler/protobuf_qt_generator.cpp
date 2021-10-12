@@ -160,6 +160,97 @@ namespace
         });
     }
 
+
+
+    void generate_private_proto_declaration(InsertionPointWriter &writer,
+                                                const std::string &class_name)
+    {
+
+
+            std::map<std::string, std::string> params = {
+                { "class_name", class_name },
+                };
+
+        writer.write(
+            "   $class_name$ toProto();\n"
+            "   $class_name$ *toProtoPointer();\n"
+            "   void merge(const $class_name$& from);\n"
+            "   void copy(const $class_name$& from);\n"
+            "   Q_INVOKABLE void merge($class_name$Wrapper* from);\n"
+            "   Q_INVOKABLE void copy($class_name$Wrapper* from);\n",
+            params);  
+    }
+
+
+    void generate_private_repeated_declaration(InsertionPointWriter &writer,
+                                       const google::protobuf::FieldDescriptor &field, const std::string &class_name)
+    {
+        if (field.is_map())
+        {
+
+        }
+        else if (field.is_repeated())
+        {
+
+                std::map<std::string, std::string> params = {
+                    { "field_name", snake_to_camel(field.lowercase_name()) },
+                    { "setter_name", snake_to_camel("set_" + field.lowercase_name()) },
+                    { "class_name", class_name },
+                    { "source_class_name", dot_to_colon(field.containing_type()->full_name()) },
+                    { "source_field_name", to_lowercase(field.name()) },
+                    };
+
+            if (field.cpp_type() == google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE)
+            {
+                params["field_type"] = field.message_type()->name() + "Wrapper";
+            }
+            else if (field.cpp_type() == google::protobuf::FieldDescriptor::CPPTYPE_ENUM)
+            {
+                params["field_type"] = cpp_wrapper_type(*field.enum_type());
+            }
+            else if (field.cpp_type() == google::protobuf::FieldDescriptor::CPPTYPE_STRING)
+            {
+
+                params["field_type"] = "QString";
+            }
+            else
+            {
+                params["field_type"] = cpp_type(field);
+            }
+
+            writer.write(
+                "  static void append_$field_name$(QQmlListProperty<$field_type$> * list, $field_type$* p);\n"
+                "  static void clear_$field_name$(QQmlListProperty<$field_type$> * list);\n"
+                "  static $field_type$* get_$field_name$(QQmlListProperty<$field_type$> * list, int i);\n"
+                "  static int $field_name$_count(QQmlListProperty<$field_type$> * list);\n",
+                params);
+
+        }
+    }
+
+
+    void generate_unique_ptr_declaration(InsertionPointWriter &writer,
+                                         const google::protobuf::FieldDescriptor &field, const std::string &class_name){
+
+        if (field.cpp_type() == google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE)
+        {
+            std::map<std::string, std::string> params = {
+                { "field_name", snake_to_camel(field.lowercase_name()) },
+                { "setter_name", snake_to_camel("set_" + field.lowercase_name()) },
+                { "class_name", class_name },
+                { "source_class_name", dot_to_colon(field.containing_type()->full_name()) },
+                { "source_field_name", to_lowercase(field.name()) },
+                };
+
+            params["field_type"] = field.message_type()->name() + "Wrapper";
+
+            writer.write("  std::unique_ptr<$field_type$> $field_name$_ptr;\n", params);
+
+        }
+
+    }
+
+
     void generate_property_declaration(InsertionPointWriter &writer,
                                        const google::protobuf::FieldDescriptor &field)
     {
@@ -169,7 +260,32 @@ namespace
         }
         else if (field.is_repeated())
         {
+            std::map<std::string, std::string> params =
+                {
+                    { "field_name", snake_to_camel(field.lowercase_name()) },
+                    { "setter_name", snake_to_camel("set_" + field.lowercase_name()) }
+                };
 
+            if (field.cpp_type() == google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE)
+            {
+                params["field_type"] = cpp_type(* field.message_type()) + "Wrapper";
+
+
+                //cpp_type(*field.containing_type()) +
+
+               //return;
+            }  else if (field.cpp_type() == google::protobuf::FieldDescriptor::CPPTYPE_STRING)
+            {
+
+                params["field_type"] = "QString";
+            }
+            else
+            {
+                params["field_type"] = cpp_type(field);
+            }
+
+            writer.write("  Q_PROPERTY(QQmlListProperty<$field_type$> $field_name$ READ $field_name$ "
+                         "NOTIFY $field_name$Changed)\n", params);
         }
         else
         {
@@ -182,7 +298,6 @@ namespace
             if (field.cpp_type() == google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE)
             {
                 params["field_type"] = field.message_type()->name() + "Wrapper *";
-                return;
             }
             else if (field.cpp_type() == google::protobuf::FieldDescriptor::CPPTYPE_ENUM)
             {
@@ -190,10 +305,6 @@ namespace
             }
             else if (field.cpp_type() == google::protobuf::FieldDescriptor::CPPTYPE_STRING)
             {
-                if (field.options().has_ctype())
-                {
-                    return;
-                }
 
                 params["field_type"] = "QString";
             }
@@ -207,6 +318,79 @@ namespace
         }
     }
 
+
+    std::string generate_emiters_all(InsertionPointWriter &writer,
+                                     const google::protobuf::FieldDescriptor &field)
+    {
+        if (field.is_map())
+        {
+
+        }
+        else if (field.is_repeated())
+        {
+
+
+                std::map<std::string, std::string> params =
+                    {
+                        { "field_name", snake_to_camel(field.lowercase_name()) },
+                        };
+
+            if (field.cpp_type() == google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE)
+            {
+                params["field_type"] = field.message_type()->name() + "Wrapper *";
+            }
+            else if (field.cpp_type() == google::protobuf::FieldDescriptor::CPPTYPE_ENUM)
+            {
+                params["field_type"] = cpp_wrapper_type(*field.enum_type());
+            }
+            else if (field.cpp_type() == google::protobuf::FieldDescriptor::CPPTYPE_STRING)
+            {
+                params["field_type"] = "QString";
+            }
+            else
+            {
+                params["field_type"] = cpp_type(field);
+            }
+
+                //writer.write("  void $field_name$Changed($field_type$ value);\n", params);
+
+                return " emit " + params["field_name"] + "Changed();\n";
+
+
+                }
+        else
+        {
+            std::map<std::string, std::string> params =
+                {
+                    { "field_name", snake_to_camel(field.lowercase_name()) },
+                    };
+
+            if (field.cpp_type() == google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE)
+            {
+                params["field_type"] = field.message_type()->name() + "Wrapper *";
+            }
+            else if (field.cpp_type() == google::protobuf::FieldDescriptor::CPPTYPE_ENUM)
+            {
+                params["field_type"] = cpp_wrapper_type(*field.enum_type());
+            }
+            else if (field.cpp_type() == google::protobuf::FieldDescriptor::CPPTYPE_STRING)
+            {
+                params["field_type"] = "QString";
+            }
+            else
+            {
+                params["field_type"] = cpp_type(field);
+            }
+
+            //writer.write("  emit $field_name$Changed(this->$field_name$());\n", params);
+
+            return " emit " + params["field_name"] + "Changed(this->" + params["field_name"]+"());\n";
+
+
+        }
+        return "";
+    }
+
     void generate_signal_declaration(InsertionPointWriter &writer,
                                      const google::protobuf::FieldDescriptor &field)
     {
@@ -216,6 +400,31 @@ namespace
         }
         else if (field.is_repeated())
         {
+
+
+                std::map<std::string, std::string> params =
+                    {
+                        { "field_name", snake_to_camel(field.lowercase_name()) },
+                        };
+
+            if (field.cpp_type() == google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE)
+            {
+                params["field_type"] = field.message_type()->name() + "Wrapper *";
+            }
+            else if (field.cpp_type() == google::protobuf::FieldDescriptor::CPPTYPE_ENUM)
+            {
+                params["field_type"] = cpp_wrapper_type(*field.enum_type());
+            }
+            else if (field.cpp_type() == google::protobuf::FieldDescriptor::CPPTYPE_STRING)
+            {
+                params["field_type"] = "QString";
+            }
+            else
+            {
+                params["field_type"] = cpp_type(field);
+            }
+
+            writer.write("  void $field_name$Changed();\n", params);
 
         }
         else
@@ -228,7 +437,6 @@ namespace
             if (field.cpp_type() == google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE)
             {
                 params["field_type"] = field.message_type()->name() + "Wrapper *";
-                return;
             }
             else if (field.cpp_type() == google::protobuf::FieldDescriptor::CPPTYPE_ENUM)
             {
@@ -236,11 +444,6 @@ namespace
             }
             else if (field.cpp_type() == google::protobuf::FieldDescriptor::CPPTYPE_STRING)
             {
-                if (field.options().has_ctype())
-                {
-                    return;
-                }
-
                 params["field_type"] = "QString";
             }
             else
@@ -262,6 +465,38 @@ namespace
         else if (field.is_repeated())
         {
 
+
+            std::map<std::string, std::string> params =
+                {
+                    { "field_name", snake_to_camel(field.lowercase_name()) },
+                    { "setter_name", snake_to_camel("set_" + field.lowercase_name()) }
+                };
+
+            if (field.cpp_type() == google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE)
+            {
+                params["field_type"] = field.message_type()->name() + "Wrapper";
+            }
+            else if (field.cpp_type() == google::protobuf::FieldDescriptor::CPPTYPE_ENUM)
+            {
+                params["field_type"] = cpp_wrapper_type(*field.enum_type());
+            }
+            else if (field.cpp_type() == google::protobuf::FieldDescriptor::CPPTYPE_STRING)
+            {
+
+                params["field_type"] = "QString";
+            }
+            else
+            {
+                params["field_type"] = cpp_type(field);
+            }
+
+            writer.write(
+                "  QQmlListProperty<$field_type$> $field_name$();\n"
+                "  Q_INVOKABLE void append_$field_name$($field_type$* value);\n"
+                "  Q_INVOKABLE int $field_name$_count() const;\n"
+                "  Q_INVOKABLE $field_type$* get_$field_name$(int value) const;\n"
+                "  Q_INVOKABLE void clear_$field_name$();\n",
+                params);
         }
         else
         {
@@ -274,31 +509,88 @@ namespace
             if (field.cpp_type() == google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE)
             {
                 params["field_type"] = field.message_type()->name() + "Wrapper *";
-                return;
-            }
-            else if (field.cpp_type() == google::protobuf::FieldDescriptor::CPPTYPE_ENUM)
-            {
-                params["field_type"] = cpp_wrapper_type(*field.enum_type());
-            }
-            else if (field.cpp_type() == google::protobuf::FieldDescriptor::CPPTYPE_STRING)
-            {
-                if (field.options().has_ctype())
+
+                writer.write(
+                    "  $field_type$ $field_name$();\n"
+                    "  void $setter_name$($field_type$ value);\n",
+                    params);
+            }else {
+
+
+                if (field.cpp_type() == google::protobuf::FieldDescriptor::CPPTYPE_ENUM)
                 {
-                    return;
+                    params["field_type"] = cpp_wrapper_type(*field.enum_type());
+                }
+                else if (field.cpp_type() == google::protobuf::FieldDescriptor::CPPTYPE_STRING)
+                {
+                    params["field_type"] = "QString";
+                }
+                else
+                {
+                    params["field_type"] = cpp_type(field);
                 }
 
-                params["field_type"] = "QString";
-            }
-            else
-            {
-                params["field_type"] = cpp_type(field);
+                writer.write(
+                    "  $field_type$ $field_name$() const;\n"
+                    "  void $setter_name$($field_type$ value);\n",
+                    params);
+
             }
 
-            writer.write(
-                "  $field_type$ $field_name$() const;\n"
-                "  void $setter_name$($field_type$ value);\n",
-                params);
+
         }
+    }
+
+
+        void generate_private_proto_implementation(InsertionPointWriter &writer, const google::protobuf::Descriptor &descriptor,
+                                                const std::string &class_name)
+    {
+
+
+            std::map<std::string, std::string> params = {
+                { "class_name", class_name }
+                };
+
+
+            std::string emiters;
+
+            for (const google::protobuf::FieldDescriptor &field : repeated_field_adaptor(descriptor))
+            {
+                emiters = emiters + generate_emiters_all(writer,field);
+            }
+            std::string concatWriter = "   $class_name$ $class_name$Wrapper::toProto() {\n"
+                                       "   $class_name$ value;\n"
+                                       "   value.CopyFrom(*this);\n"
+                                       "   return value;\n"
+                                       "      }\n"
+                                       " \n"
+                                       "   $class_name$ *$class_name$Wrapper::toProtoPointer() {\n"
+                                       "   $class_name$ *value = new  $class_name$;\n"
+                                       "   value->CopyFrom(*this);\n"
+                                       "   return value;\n"
+                                       "      }\n"
+                                       " \n"
+                                       "   void $class_name$Wrapper::merge(const $class_name$& from) {\n"
+                                       "   MergeFrom(from);\n" +
+                                       emiters + "\n"
+                                       "      }\n"
+                                       "   void $class_name$Wrapper::copy(const $class_name$& from) {\n"
+                                       "   CopyFrom(from);\n" +
+                                       emiters + "\n"
+                                       "      }\n"
+                                       "   void $class_name$Wrapper::copy($class_name$Wrapper* from) {\n"
+                                       "   CopyFrom(from->toProto());\n" +
+                                       emiters + "\n"
+                                       "      }\n"
+                                       "   void $class_name$Wrapper::merge($class_name$Wrapper* from) {\n"
+                                       "   MergeFrom(from->toProto());\n" +
+                                       emiters + "\n"
+                                       "      }\n";
+            char *emit = concatWriter.data();
+
+        writer.write(emit, params);
+
+
     }
 
     void generate_setter_getter_implementation(InsertionPointWriter &writer,
@@ -311,6 +603,59 @@ namespace
         }
         else if (field.is_repeated())
         {
+
+        std::map<std::string, std::string> params = {
+                        { "field_name", snake_to_camel(field.lowercase_name()) },
+                        { "setter_name", snake_to_camel("set_" + field.lowercase_name()) },
+                        { "class_name", class_name },
+                        { "source_class_name", dot_to_colon(field.containing_type()->full_name()) },
+                        { "source_field_name", to_lowercase(field.name()) },
+                        };
+
+        if (field.cpp_type() == google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE) {
+                params["field_type"] = field.message_type()->name() + "Wrapper";
+                params["proto_field_type"] = field.message_type()->name();
+              }
+
+            writer.write(
+                "QQmlListProperty<$field_type$> $class_name$Wrapper::$field_name$() {\n"
+                "return QQmlListProperty<$field_type$>(this, this,\n"
+                "&$class_name$Wrapper::append_$field_name$,\n"
+                "&$class_name$Wrapper::$field_name$_count,\n"
+                "&$class_name$Wrapper::get_$field_name$,\n"
+                "&$class_name$Wrapper::clear_$field_name$);}\n"
+                "\n"
+                "void $class_name$Wrapper::append_$field_name$($field_type$* value) {\n"
+                    "$proto_field_type$ proto;\n"
+                    "proto.CopyFrom(value->toProto());\n"
+                    "$class_name$Wrapper::add_$field_name$()->MergeFrom(proto);\n"
+                       "emit $field_name$Changed();}\n"
+                 "\n"
+                 "int $class_name$Wrapper::$field_name$_count() const {\n"
+                 "return $class_name$::$field_name$().size();}\n"
+                  "\n"
+                  "$field_type$* $class_name$Wrapper::get_$field_name$(int index) const {\n"
+                  "$field_type$ *$field_name$Wrapper = new $field_type$;\n"
+                  "$field_name$Wrapper->CopyFrom($class_name$::$field_name$(index));\n"
+                  "return $field_name$Wrapper;\n"
+                  "}\n"
+                  "\n"
+                  "void $class_name$Wrapper::clear_$field_name$() {\n"
+                  "$class_name$::clear_$field_name$();}\n"
+                  "\n"
+                  "void $class_name$Wrapper::append_$field_name$(QQmlListProperty<$field_type$> * list, $field_type$* p) {\n"
+                  "reinterpret_cast< $class_name$Wrapper* >(list->data)->append_$field_name$(p);}\n"
+                  "\n"
+                  "void $class_name$Wrapper::clear_$field_name$(QQmlListProperty<$field_type$> * list) {\n"
+                  "reinterpret_cast< $class_name$Wrapper* >(list->data)->clear_$field_name$();}\n"
+                  "\n"
+                  "$field_type$* $class_name$Wrapper::get_$field_name$(QQmlListProperty<$field_type$> * list, int i) {\n"
+                  "return reinterpret_cast< $class_name$Wrapper* >(list->data)->get_$field_name$(i);}\n"
+                  "\n"
+                  "int $class_name$Wrapper::$field_name$_count(QQmlListProperty<$field_type$> * list) {\n"
+                  "return reinterpret_cast< $class_name$Wrapper* >(list->data)->$field_name$_count();}\n"
+                  "\n",
+                params);
 
         }
         else
@@ -326,8 +671,24 @@ namespace
 
             if (field.cpp_type() == google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE)
             {
-                params["field_type"] = field.message_type()->name() + "Wrapper *";
-                return;
+                //params["field_type"] = field.message_type()->name() + "Wrapper *";
+
+                params["field_type"] = cpp_type(field);
+
+                writer.write(
+                    "  $field_type$Wrapper* $class_name$Wrapper::$field_name$() {\n"
+                    "   $field_name$_ptr.reset(new $field_type$Wrapper());\n"
+                    "   $field_name$_ptr->CopyFrom($source_class_name$::$source_field_name$());\n "
+                    "   return $field_name$_ptr.get();\n"
+                    "  }\n"
+                    "\n"
+                    "  void $class_name$Wrapper::$setter_name$($field_type$Wrapper* value) {\n"
+                    "    $source_class_name$::set_allocated_$source_field_name$(value->toProtoPointer());\n"
+                    "    emit $field_name$Changed(value);\n"
+                    "  }\n"
+                    "\n"
+                    , params);
+
             }
             else if (field.cpp_type() == google::protobuf::FieldDescriptor::CPPTYPE_ENUM)
             {
@@ -341,16 +702,13 @@ namespace
                     "\n"
                     "  void $class_name$Wrapper::$setter_name$($field_type$ value) {\n"
                     "    $source_class_name$::set_$source_field_name$(static_cast<$original_enum_type$>(value));\n"
+                    "    emit $field_name$Changed(value);\n"
                     "  }\n"
                     "\n"
                     , params);
             }
             else if (field.cpp_type() == google::protobuf::FieldDescriptor::CPPTYPE_STRING)
             {                
-                if (field.options().has_ctype())
-                {
-                    return;
-                }
 
                 writer.write(
                     "  QString $class_name$Wrapper::$field_name$() const {\n"
@@ -359,6 +717,7 @@ namespace
                     "\n"
                     "  void $class_name$Wrapper::$setter_name$(QString value) {\n"
                     "    $source_class_name$::set_$source_field_name$(value.toStdString());\n"
+                    "    emit $field_name$Changed(value);\n"
                     "  }\n"
                     "\n"
                     , params);
@@ -374,6 +733,7 @@ namespace
                     "\n"
                     "  void $class_name$Wrapper::$setter_name$($field_type$ value) {\n"
                     "    $source_class_name$::set_$source_field_name$(value);\n"
+                    "    emit $field_name$Changed(value);\n"
                     "  }\n"
                     "\n"
                     , params);
@@ -447,6 +807,17 @@ namespace
             generate_property_declaration(writer, field);
         }
 
+        for (const google::protobuf::FieldDescriptor &field : repeated_field_adaptor(descriptor))
+        {
+            generate_private_repeated_declaration(writer, field, class_name);
+        }
+
+        for (const google::protobuf::FieldDescriptor &field : repeated_field_adaptor(descriptor))
+        {
+            generate_unique_ptr_declaration(writer, field, class_name);
+        }
+
+
         writer.write(
             "\n"
             "public:\n"
@@ -456,6 +827,11 @@ namespace
         {
             generate_nested_typedef_declaration(writer, nested_descriptor, class_name);
         }
+
+
+        generate_private_proto_declaration(writer, class_name);
+
+
 
         writer.write(
             "\n"
@@ -506,6 +882,9 @@ namespace
         {
             generate_setter_getter_implementation(writer, field, class_name);
         }
+
+
+        generate_private_proto_implementation(writer, descriptor, class_name);
     }
 
     void generate_forward_declaration(InsertionPointWriter &writer,
@@ -557,6 +936,7 @@ void ProtobufQtGenerator::Generate(const google::protobuf::FileDescriptor &file,
     {
         auto writer = writer_factory.make_header_writer("includes");
         writer.writeln("#include <QObject>");
+        writer.writeln("#include <QQmlListProperty>");
     }
 
     auto header_writer = writer_factory.make_header_writer("namespace_scope");
